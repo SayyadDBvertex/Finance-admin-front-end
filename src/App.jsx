@@ -7,7 +7,7 @@ import Dashboard from './pages/Dashboard';
 function App() {
   const { isAuthenticated, loading } = useAuth();
 
-  // Show loading state while auth is initializing
+  // Show loading state while auth is initializings
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900">
