@@ -7,11 +7,13 @@ import {
   Settings,
   LogOut,
 } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
+
 import { useAuth } from '../context/AuthContext';
 
 const Sidebar = () => {
   const { logout } = useAuth();
-
+  const location = useLocation(); // ✅ ADD THIS
   const menuItems = [
     {
       name: 'Dashboard',
@@ -22,6 +24,11 @@ const Sidebar = () => {
       name: 'Users',
       path: '/admin/users',
       icon: <Users size={20} />,
+    },
+    {
+      name: 'Create-IncomeCategory',
+      path: '/admin/income-category',
+      icon: <CreditCard size={20} />,
     },
     {
       name: 'Transactions',

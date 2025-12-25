@@ -7,6 +7,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AdminLayout from './layouts/AdminLayout';
 import Dashboard from './pages/Dashboard';
 import ManageUsers from './pages/ManageUsers/ManageUsers';
+import IncomeCategory from './pages/IcomeCategory/IcomeCategory';
 
 function App() {
   const { isAuthenticated, loading } = useAuth();
@@ -41,6 +42,7 @@ function App() {
 
         {/* Manage Users */}
         <Route path="admin/users" element={<ManageUsers />} />
+        <Route path="/admin/income-category" element={<IncomeCategory />} />
       </Route>
 
       {/* ================= FALLBACK ================= */}
