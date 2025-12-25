@@ -1,13 +1,16 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
+
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
+
+import AdminLayout from './layouts/AdminLayout';
 import Dashboard from './pages/Dashboard';
+import ManageUsers from './pages/ManageUsers/ManageUsers';
 
 function App() {
   const { isAuthenticated, loading } = useAuth();
 
-  // Show loading state while auth is initializings
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900">
@@ -18,33 +21,29 @@ function App() {
 
   return (
     <Routes>
-      {/* Public route - Login page */}
+      {/* ================= PUBLIC ================= */}
       <Route
         path="/login"
         element={isAuthenticated ? <Navigate to="/" replace /> : <Login />}
       />
 
-      {/* Protected routes */}
+      {/* ================= ADMIN LAYOUT ================= */}
       <Route
         path="/"
         element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* Admin-only routes example */}
-      <Route
-        path="/admin"
-        element={
           <ProtectedRoute requiredRole="admin">
-            <Dashboard />
+            <AdminLayout />
           </ProtectedRoute>
         }
-      />
+      >
+        {/* Dashboard */}
+        <Route index element={<Dashboard />} />
 
-      {/* Fallback - redirect to home if authenticated, login if not */}
+        {/* Manage Users */}
+        <Route path="admin/users" element={<ManageUsers />} />
+      </Route>
+
+      {/* ================= FALLBACK ================= */}
       <Route
         path="*"
         element={<Navigate to={isAuthenticated ? '/' : '/login'} replace />}
