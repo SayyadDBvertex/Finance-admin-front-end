@@ -6,6 +6,7 @@ import {
   CreditCard,
   Settings,
   LogOut,
+  Banknote,
 } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 
@@ -28,7 +29,7 @@ const Sidebar = () => {
     {
       name: 'Create-IncomeCategory',
       path: '/admin/income-category',
-      icon: <CreditCard size={20} />,
+      icon: <Banknote size={20} />,
     },
     {
       name: 'Transactions',
