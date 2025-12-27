@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-
-const API_URL = 'http://localhost:3012/api/income-category';
+import API from '../../api/api.js';
 
 const IncomeCategory = () => {
   const [categories, setCategories] = useState([]);
@@ -13,7 +12,7 @@ const IncomeCategory = () => {
   /* ================= FETCH ALL ================= */
   const fetchCategories = async () => {
     try {
-      const res = await axios.get(API_URL);
+      const res = await API.get('/api/income-category'); // 🔥 backend API
       setCategories(res.data.categories || []);
     } catch (err) {
       Swal.fire('Error', 'Failed to fetch categories', 'error');
@@ -48,11 +47,11 @@ const IncomeCategory = () => {
     try {
       if (editId) {
         // UPDATE
-        await axios.put(`${API_URL}/${editId}`, { name });
+        await API.put(`/api/income-category/${editId}`, { name });
         Swal.fire('Updated', 'Category updated successfully', 'success');
       } else {
         // CREATE
-        await axios.post(API_URL, { name });
+        await API.post('/api/income-category', { name });
         Swal.fire('Created', 'Category created successfully', 'success');
       }
 
@@ -80,7 +79,7 @@ const IncomeCategory = () => {
     if (!result.isConfirmed) return;
 
     try {
-      await axios.delete(`${API_URL}/${id}`);
+      await API.delete(`/api/income-category/${id}`);
       Swal.fire('Deleted', 'Category deleted successfully', 'success');
       fetchCategories();
     } catch (err) {
@@ -91,7 +90,12 @@ const IncomeCategory = () => {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Income Categories</h2>
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-white">Income Categories</h1>
+          <p className="text-sm text-white/80 mt-1">
+            View all Icome-categories
+          </p>
+        </div>
         <button
           onClick={openCreateModal}
           className="bg-black text-white px-4 py-2 rounded"
