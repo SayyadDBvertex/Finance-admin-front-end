@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import Swal from 'sweetalert2';
 import API from '../../api/api.js';
 
@@ -8,11 +7,12 @@ const IncomeCategory = () => {
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [name, setName] = useState('');
+  const [image, setImage] = useState(null); // ✅ NEW
 
   /* ================= FETCH ALL ================= */
   const fetchCategories = async () => {
     try {
-      const res = await API.get('/api/income-category'); // 🔥 backend API
+      const res = await API.get('/api/income-category');
       setCategories(res.data.categories || []);
     } catch (err) {
       Swal.fire('Error', 'Failed to fetch categories', 'error');
@@ -27,12 +27,14 @@ const IncomeCategory = () => {
   const openCreateModal = () => {
     setEditId(null);
     setName('');
+    setImage(null);
     setShowModal(true);
   };
 
   const openEditModal = (category) => {
     setEditId(category._id);
     setName(category.name);
+    setImage(null); // image optional on update
     setShowModal(true);
   };
 
@@ -45,13 +47,23 @@ const IncomeCategory = () => {
     }
 
     try {
+      // ✅ FormData mandatory (multer)
+      const formData = new FormData();
+      formData.append('name', name);
+
+      if (image) {
+        formData.append('image', image); // key MUST be "image"
+      }
+
       if (editId) {
-        // UPDATE
-        await API.put(`/api/income-category/${editId}`, { name });
+        await API.put(`/api/income-category/${editId}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
         Swal.fire('Updated', 'Category updated successfully', 'success');
       } else {
-        // CREATE
-        await API.post('/api/income-category', { name });
+        await API.post('/api/income-category', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
         Swal.fire('Created', 'Category created successfully', 'success');
       }
 
@@ -93,7 +105,7 @@ const IncomeCategory = () => {
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-white">Income Categories</h1>
           <p className="text-sm text-white/80 mt-1">
-            View all Icome-categories
+            View all income categories
           </p>
         </div>
         <button
@@ -110,6 +122,7 @@ const IncomeCategory = () => {
           <tr className="bg-gray-100">
             <th className="border p-2">S/No.</th>
             <th className="border p-2">Name</th>
+            <th className="border p-2">Icon</th>
             <th className="border p-2">Status</th>
             <th className="border p-2">Actions</th>
           </tr>
@@ -117,7 +130,7 @@ const IncomeCategory = () => {
         <tbody>
           {categories.length === 0 ? (
             <tr>
-              <td colSpan="4" className="text-center p-4">
+              <td colSpan="5" className="text-center p-4">
                 No categories found
               </td>
             </tr>
@@ -126,6 +139,17 @@ const IncomeCategory = () => {
               <tr key={cat._id}>
                 <td className="border p-2 text-center">{index + 1}</td>
                 <td className="border p-2 text-center">{cat.name}</td>
+                <td className="border p-2 text-center">
+                  {cat.image ? (
+                    <img
+                      src={`${import.meta.env.VITE_API_BASE_URL}${cat.image}`}
+                      alt="icon"
+                      className="w-10 h-10 mx-auto object-cover"
+                    />
+                  ) : (
+                    '—'
+                  )}
+                </td>
                 <td className="border p-2 text-center">
                   {cat.status ? 'Active' : 'Inactive'}
                 </td>
@@ -163,6 +187,14 @@ const IncomeCategory = () => {
                 placeholder="Category Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                className="w-full border p-2 mb-3"
+              />
+
+              {/* ✅ IMAGE INPUT */}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setImage(e.target.files[0])}
                 className="w-full border p-2 mb-4"
               />
 
