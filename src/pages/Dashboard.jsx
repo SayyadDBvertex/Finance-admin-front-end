@@ -1,37 +1,42 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login', { replace: true });
-  };
+  const { user } = useAuth();
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-900 text-white p-4">
-      <div className="max-w-2xl w-full bg-black/80 p-8 rounded-2xl shadow-lg">
-        <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-        <p className="mt-2 text-sm text-gray-300">
-          Welcome{user?.name ? `, ${user.name}` : ''}.
+    <>
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-white">Admin Dashboard</h1>
+        <p className="text-sm text-white/80 mt-1">
+          Welcome{user?.name ? `, ${user.name}` : ''} 👋
         </p>
-        <p className="mt-1 text-xs text-gray-400">
-          Role: {user?.role ?? 'user'}
-        </p>
+      </div>
 
-        <div className="mt-6 flex gap-3">
-          <button
-            onClick={handleLogout}
-            className="rounded-lg bg-red-600 px-4 py-2 text-white"
-          >
-            Logout
-          </button>
+      {/* Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white rounded-2xl p-6 shadow-lg">
+          <p className="text-sm text-gray-500">Total Users</p>
+          <h2 className="text-3xl font-bold">1,245</h2>
+        </div>
+
+        <div className="bg-white rounded-2xl p-6 shadow-lg">
+          <p className="text-sm text-gray-500">Transactions</p>
+          <h2 className="text-3xl font-bold">8,420</h2>
+        </div>
+
+        <div className="bg-white rounded-2xl p-6 shadow-lg">
+          <p className="text-sm text-gray-500">Revenue</p>
+          <h2 className="text-3xl font-bold">₹4.6L</h2>
+        </div>
+
+        <div className="bg-white rounded-2xl p-6 shadow-lg">
+          <p className="text-sm text-gray-500">Active Today</p>
+          <h2 className="text-3xl font-bold">312</h2>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

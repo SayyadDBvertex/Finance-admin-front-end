@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import API from '../api/api';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -12,7 +13,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Redirect if already authenticated
+  // Redirect if already logged in
   useEffect(() => {
     if (!loading && isAuthenticated) {
       const from = location.state?.from?.pathname || '/';
@@ -20,7 +21,7 @@ const Login = () => {
     }
   }, [isAuthenticated, loading, navigate, location]);
 
-  // Prevent render while loading / already logged in
+  // Loader screen
   if (loading || isAuthenticated) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-blue-600 via-blue-500 to-purple-600">
@@ -34,49 +35,35 @@ const Login = () => {
     setError('');
     setIsSubmitting(true);
 
-    // Basic validation
-    if (!email.trim() || !password.trim()) {
-      setError('Email and password are required');
-      setIsSubmitting(false);
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError('Please enter a valid email address');
-      setIsSubmitting(false);
-      return;
-    }
-
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
-      setIsSubmitting(false);
-      return;
-    }
-
     try {
-      // 🔥 Replace this with real API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Mock response
-      const mockToken = `mock_token_${Date.now()}`;
-      const mockUser = {
-        id: `user_${Date.now()}`,
+      // 🔥 REAL BACKEND LOGIN (ONLY DB USERS CAN LOGIN)
+      const response = await API.post('/api/admin/login', {
         email,
-        name: email.split('@')[0],
-        role: 'admin', // change to 'user' if needed
-      };
+        password,
+      });
 
+      const { data } = response.data;
+
+      // Save auth data
       login({
-        token: mockToken,
-        user: mockUser,
+        token: data.token,
+        user: {
+          id: data._id,
+          role: data.role,
+          email: data.email,
+        },
       });
 
       const from = location.state?.from?.pathname || '/';
       navigate(from, { replace: true });
     } catch (err) {
       console.error('Login error:', err);
-      setError('Login failed. Please try again.');
+
+      // Backend error message
+      const message =
+        err?.response?.data?.message || 'Invalid email or password';
+
+      setError(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -150,7 +137,6 @@ const Login = () => {
         <p className="text-center text-xs text-gray-400 mt-6">
           🔒 Secured Admin Access
         </p>
-
         <p className="text-[11px] text-center text-gray-500 mt-4">
           By continuing, you agree to our{' '}
           <span className="text-blue-400 cursor-pointer">Terms</span> and{' '}
