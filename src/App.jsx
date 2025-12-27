@@ -8,6 +8,7 @@ import AdminLayout from './layouts/AdminLayout';
 import Dashboard from './pages/Dashboard';
 import ManageUsers from './pages/ManageUsers/ManageUsers';
 import IncomeCategory from './pages/IcomeCategory/IcomeCategory';
+import ExpenseCategory from './pages/ExpenseCategory/ExpenseCategory';
 
 function App() {
   const { isAuthenticated, loading } = useAuth();
@@ -43,6 +44,7 @@ function App() {
         {/* Manage Users */}
         <Route path="admin/users" element={<ManageUsers />} />
         <Route path="/admin/income-category" element={<IncomeCategory />} />
+        <Route path="/admin/expense-category" element={<ExpenseCategory />} />
       </Route>
 
       {/* ================= FALLBACK ================= */}

@@ -27,8 +27,13 @@ const Sidebar = () => {
       icon: <Users size={20} />,
     },
     {
-      name: 'Create-IncomeCategory',
+      name: 'IncomeCategory',
       path: '/admin/income-category',
+      icon: <Banknote size={20} />,
+    },
+    {
+      name: 'ExpenseCategory',
+      path: '/admin/expense-category',
       icon: <Banknote size={20} />,
     },
     {
