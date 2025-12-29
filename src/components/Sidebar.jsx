@@ -6,7 +6,9 @@ import {
   CreditCard,
   Settings,
   LogOut,
-  Banknote,
+  HelpCircle,
+  IndianRupee,
+  Receipt,
 } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 
@@ -27,9 +29,19 @@ const Sidebar = () => {
       icon: <Users size={20} />,
     },
     {
-      name: 'Create-IncomeCategory',
+      name: 'IncomeCategory',
       path: '/admin/income-category',
-      icon: <Banknote size={20} />,
+      icon: <IndianRupee size={20} />,
+    },
+    {
+      name: 'ExpenseCategory',
+      path: '/admin/expense-category',
+      icon: <Receipt size={20} />,
+    },
+    {
+      name: 'FAQ',
+      path: '/admin/faq',
+      icon: <HelpCircle size={20} />,
     },
     {
       name: 'Transactions',
