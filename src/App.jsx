@@ -10,6 +10,7 @@ import ManageUsers from './pages/ManageUsers/ManageUsers';
 import IncomeCategory from './pages/IcomeCategory/IcomeCategory';
 import ExpenseCategory from './pages/ExpenseCategory/ExpenseCategory';
 import AdminFaq from './pages/AdminFaq/AdminFaq';
+import AdminFeedback from './pages/AdminFeedback/AdminFeedback';
 
 function App() {
   const { isAuthenticated, loading } = useAuth();
@@ -47,6 +48,7 @@ function App() {
         <Route path="/admin/income-category" element={<IncomeCategory />} />
         <Route path="/admin/expense-category" element={<ExpenseCategory />} />
         <Route path="/admin/faq" element={<AdminFaq />} />
+        <Route path="/admin/feedback" element={<AdminFeedback />} />
       </Route>
 
       {/* ================= FALLBACK ================= */}

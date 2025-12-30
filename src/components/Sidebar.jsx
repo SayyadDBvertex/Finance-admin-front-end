@@ -3,12 +3,12 @@ import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard,
   Users,
-  CreditCard,
   Settings,
   LogOut,
   HelpCircle,
   IndianRupee,
   Receipt,
+  Share2,
 } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 
@@ -39,14 +39,14 @@ const Sidebar = () => {
       icon: <Receipt size={20} />,
     },
     {
-      name: 'FAQ',
+      name: 'Help & FAQ',
       path: '/admin/faq',
       icon: <HelpCircle size={20} />,
     },
     {
-      name: 'Transactions',
-      path: '/admin/transactions',
-      icon: <CreditCard size={20} />,
+      name: 'Send Feedback',
+      path: '/admin/feedback',
+      icon: <Share2 size={20} />,
     },
     {
       name: 'Settings',
