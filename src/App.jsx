@@ -11,6 +11,10 @@ import IncomeCategory from './pages/IcomeCategory/IcomeCategory';
 import ExpenseCategory from './pages/ExpenseCategory/ExpenseCategory';
 import AdminFaq from './pages/AdminFaq/AdminFaq';
 import AdminFeedback from './pages/AdminFeedback/AdminFeedback';
+import { PrivacyPolicy } from './pages/privacyPolicy';
+import 'react-quill-new/dist/quill.snow.css';
+import { AboutUs } from './pages/About';
+
 
 function App() {
   const { isAuthenticated, loading } = useAuth();
@@ -49,6 +53,9 @@ function App() {
         <Route path="/admin/expense-category" element={<ExpenseCategory />} />
         <Route path="/admin/faq" element={<AdminFaq />} />
         <Route path="/admin/feedback" element={<AdminFeedback />} />
+        <Route path='/admin/privacy-policy' element={<PrivacyPolicy/>}/>
+        <Route path='/admin/about-us' element={<AboutUs/>}/>
+
       </Route>
 
       {/* ================= FALLBACK ================= */}

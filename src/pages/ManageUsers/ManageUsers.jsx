@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import API from '../../api/api.js';
-import defaultAvatar from '../../assets/default.png';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import API from "../../api/api.js";
+import defaultAvatar from "../../assets/default.png";
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
 
   // 🔹 MODAL STATES
   const [showModal, setShowModal] = useState(false);
@@ -16,7 +17,7 @@ const ManageUsers = () => {
   const [txLoading, setTxLoading] = useState(false);
 
   // 🔥 ADDED: tab rename
-  const [activeTab, setActiveTab] = useState('transaction');
+  const [activeTab, setActiveTab] = useState("transaction");
 
   useEffect(() => {
     fetchUsers();
@@ -26,11 +27,11 @@ const ManageUsers = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const res = await API.get('/api/user');
+      const res = await API.get("/api/user");
       setUsers(res.data.users || []);
     } catch (err) {
       console.error(err);
-      setError('Failed to fetch users');
+      setError("Failed to fetch users");
     } finally {
       setLoading(false);
     }
@@ -41,40 +42,20 @@ const ManageUsers = () => {
     setSelectedUser(user);
     setShowModal(true);
     setTxLoading(true);
-    setActiveTab('transaction');
+    setActiveTab("transaction");
 
     try {
-      const [txRes, splitRes] = await Promise.allSettled([
-        API.get(`/api/user/transaction/${user._id}`),
-        API.get(`/api/user/split/${user._id}`),
+      const token = localStorage.getItem("token");
+      const [transactionResult] = await Promise.allSettled([
+        API.get(`/api/user/transaction/${user._id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }),
       ]);
-
-      const txData =
-        txRes.status === 'fulfilled' ? txRes.value?.data?.data || [] : [];
-
-      const splitRaw =
-        splitRes.status === 'fulfilled' ? splitRes.value?.data?.data || [] : [];
-
-      const splitFlattened = splitRaw.flatMap((doc) => {
-        if (Array.isArray(doc.splitData) && doc.splitData.length > 0) {
-          return doc.splitData.map((entry) => ({
-            _id: entry._id,
-            title: `${entry.name} (${entry.paidStatus})`,
-            amount: entry.splitAmount ?? doc.amount ?? 0,
-            createdAt:
-              entry.createdAt || doc.createdAt || new Date().toISOString(),
-            transactionType: 'split',
-          }));
-        }
-        return [];
-      });
-
-      const combined = [...txData, ...splitFlattened].sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-
-      setTransactions(combined);
+      if (transactionResult.status === "fulfilled") {
+        setTransactions(transactionResult.value.data.data);
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -82,12 +63,7 @@ const ManageUsers = () => {
     }
   };
 
-  // 🔥 ADDED: filters (NO logic changed, sirf reuse)
-  const incomeList = transactions.filter((t) => t.transactionType === 'income');
-  const expenseList = transactions.filter(
-    (t) => t.transactionType === 'expense'
-  );
-  const splitList = transactions.filter((t) => t.transactionType === 'split');
+  console.log(transactions, "ggg");
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-purple-600">
@@ -149,29 +125,29 @@ const ManageUsers = () => {
                       </td>
 
                       <td className="p-3 font-medium whitespace-nowrap">
-                        {u.name || '-'}
+                        {u.name || "-"}
                       </td>
 
                       <td className="p-3 text-gray-600 break-all">{u.email}</td>
-                      <td className="p-3 capitalize">{u.gender || '-'}</td>
+                      <td className="p-3 capitalize">{u.gender || "-"}</td>
 
                       <td className="p-3">
-                        {u.dob ? new Date(u.dob).toLocaleDateString() : '-'}
+                        {u.dob ? new Date(u.dob).toLocaleDateString() : "-"}
                       </td>
 
-                      <td className="p-3">{u.mobile || '-'}</td>
+                      <td className="p-3">{u.mobile || "-"}</td>
 
                       <td className="p-3 capitalize">
-                        {u?.location?.city || '-'}
+                        {u?.location?.city || "-"}
                       </td>
 
                       <td className="p-3 capitalize">
-                        {u?.location?.state || '-'}
+                        {u?.location?.state || "-"}
                       </td>
 
                       <td className="p-3 capitalize">
                         <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">
-                          {u.role || 'user'}
+                          {u.role || "user"}
                         </span>
                       </td>
 
@@ -195,7 +171,7 @@ const ManageUsers = () => {
       {/* ================= MODAL ================= */}
       {showModal && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-3">
-          <div className="bg-white w-full max-w-5xl rounded-2xl shadow-xl">
+          <div className="bg-white w-full max-w-6xl rounded-2xl shadow-xl">
             {/* HEADER */}
             <div className="flex justify-between items-center px-6 py-4 border-b">
               <h2 className="text-lg md:text-xl font-bold">
@@ -210,21 +186,6 @@ const ManageUsers = () => {
             </div>
 
             {/* TABS */}
-            <div className="flex gap-3 px-6 py-4 border-b overflow-x-auto">
-              {['transaction', 'split'].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition ${
-                    activeTab === tab
-                      ? 'bg-blue-600 text-white shadow'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  {tab.toUpperCase()}
-                </button>
-              ))}
-            </div>
 
             {/* CONTENT */}
             <div className="p-6 max-h-[70vh] overflow-y-auto">
@@ -235,43 +196,92 @@ const ManageUsers = () => {
               ) : (
                 <>
                   {/* ================= TRANSACTION TAB ================= */}
-                  {activeTab === 'transaction' && (
+                  {activeTab === "transaction" && (
                     <>
                       {/* INCOME */}
                       <div className="mb-8">
                         <h3 className="text-green-600 font-semibold mb-3">
-                          Income Transactions
+                          All Transactions
                         </h3>
 
                         <div className="overflow-x-auto rounded-lg border">
                           <table className="w-full text-sm">
                             <thead className="bg-green-50 text-gray-700 uppercase text-xs">
                               <tr>
-                                <th className="px-4 py-3 text-right">Amount</th>
+                                <th className="px-4 py-3 text-center">
+                                  Amount
+                                </th>
+                                <th className="px-4 py-3 text-left">Type</th>
+
                                 <th className="px-4 py-3 text-left">Note</th>
                                 <th className="px-4 py-3 text-left">
+                                  Category
+                                </th>
+                                <th className="px-4 py-3 text-center">
+                                  Category Image
+                                </th>
+                                <th className="px-4 py-3 text-right">
                                   Date & Time
                                 </th>
                               </tr>
                             </thead>
                             <tbody>
-                              {incomeList.map((t) => (
+                              {transactions?.map((t) => (
                                 <tr
                                   key={t._id}
                                   className="border-t hover:bg-gray-50"
                                 >
-                                  <td className="px-4 py-3 text-right font-semibold text-green-600">
+                                  <td
+                                    className={`px-4 py-3 text-center font-semibold   ${
+                                      t.type == "income"
+                                        ? "text-green-600"
+                                        : "text-red-600"
+                                    } `}
+                                  >
                                     ₹{t.amount}
                                   </td>
-                                  <td className="px-4 py-3">
-                                    {t.title || '—'}
+                                  <td className="px-4 py-3 font-semibold">
+                                    {t.type || "—"}
                                   </td>
-                                  <td className="px-4 py-3 text-gray-500">
+                                  <td className="px-4 py-3">{t.note || "—"}</td>
+                                  <td className="px-4 py-3">
+                                    {t.incomeCategoryId
+                                      ? t.incomeCategoryId.name
+                                      : t.expenseCategoryId
+                                      ? t.expenseCategoryId?.name
+                                      : "-"}
+                                  </td>
+                                  <td className="px-4 py-3 text-center">
+                                    {t.incomeCategoryId ? (
+                                      <img
+                                        src={`${baseURL}${t.incomeCategoryId?.image}`}
+                                        className="h-20 w-20 rounded object-cover"
+                                        alt="income"
+                                        onError={(e) =>
+                                          (e.target.style.display = "none")
+                                        }
+                                      />
+                                    ) : t.expenseCategoryId ? (
+                                      <img
+                                        src={`${baseURL}${t.expenseCategoryId?.image}`}
+                                        className="h-20 w-20 rounded object-cover"
+                                        alt="expense"
+                                        onError={(e) =>
+                                          (e.target.style.display = "none")
+                                        }
+                                      />
+                                    ) : (
+                                      <div className="h-20 w-20 rounded bg-gray-300 flex items-center justify-center text-gray-600 font-semibold">
+                                        N/A
+                                      </div>
+                                    )}
+                                  </td>
+                                  <td className="px-4 py-3 text-gray-500 text-right">
                                     {new Date(t.createdAt).toLocaleString()}
                                   </td>
                                 </tr>
                               ))}
-                              {incomeList.length === 0 && (
+                              {transactions?.length === 0 && (
                                 <tr>
                                   <td
                                     colSpan="3"
@@ -285,103 +295,7 @@ const ManageUsers = () => {
                           </table>
                         </div>
                       </div>
-
-                      {/* EXPENSE */}
-                      <div>
-                        <h3 className="text-red-600 font-semibold mb-3">
-                          Expense Transactions
-                        </h3>
-
-                        <div className="overflow-x-auto rounded-lg border">
-                          <table className="w-full text-sm">
-                            <thead className="bg-red-50 text-gray-700 uppercase text-xs">
-                              <tr>
-                                <th className="px-4 py-3 text-right">Amount</th>
-                                <th className="px-4 py-3 text-left">Note</th>
-                                <th className="px-4 py-3 text-left">
-                                  Date & Time
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {expenseList.map((t) => (
-                                <tr
-                                  key={t._id}
-                                  className="border-t hover:bg-gray-50"
-                                >
-                                  <td className="px-4 py-3 text-right font-semibold text-red-600">
-                                    ₹{t.amount}
-                                  </td>
-                                  <td className="px-4 py-3">
-                                    {t.title || '—'}
-                                  </td>
-                                  <td className="px-4 py-3 text-gray-500">
-                                    {new Date(t.createdAt).toLocaleString()}
-                                  </td>
-                                </tr>
-                              ))}
-                              {expenseList.length === 0 && (
-                                <tr>
-                                  <td
-                                    colSpan="3"
-                                    className="py-4 text-center text-gray-400"
-                                  >
-                                    No expense transactions
-                                  </td>
-                                </tr>
-                              )}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
                     </>
-                  )}
-
-                  {/* ================= SPLIT TAB ================= */}
-                  {activeTab === 'split' && (
-                    <div className="overflow-x-auto rounded-lg border">
-                      <table className="w-full text-sm">
-                        <thead className="bg-gray-100 uppercase text-xs text-gray-700">
-                          <tr>
-                            <th className="px-4 py-3 text-right">Amount</th>
-                            <th className="px-4 py-3 text-left">Note</th>
-                            <th className="px-4 py-3 text-left">Date & Time</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {splitList.map((t) => (
-                            <tr
-                              key={t._id}
-                              className="border-t hover:bg-gray-50"
-                            >
-                              <td
-                                className={`px-4 py-3 text-right font-semibold ${
-                                  t.title.includes('(paid)')
-                                    ? 'text-green-600'
-                                    : 'text-red-600'
-                                }`}
-                              >
-                                ₹{t.amount}
-                              </td>
-                              <td className="px-4 py-3">{t.title}</td>
-                              <td className="px-4 py-3 text-gray-500">
-                                {new Date(t.createdAt).toLocaleString()}
-                              </td>
-                            </tr>
-                          ))}
-                          {splitList.length === 0 && (
-                            <tr>
-                              <td
-                                colSpan="3"
-                                className="py-4 text-center text-gray-400"
-                              >
-                                No split transactions
-                              </td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
                   )}
                 </>
               )}

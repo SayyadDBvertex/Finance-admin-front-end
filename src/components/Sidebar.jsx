@@ -38,6 +38,11 @@ const Sidebar = () => {
       path: '/admin/expense-category',
       icon: <Receipt size={20} />,
     },
+     {
+      name: 'About Us',
+      path: '/admin/about-us',
+      icon: <HelpCircle size={20} />,
+    },
     {
       name: 'Help & FAQ',
       path: '/admin/faq',
@@ -49,9 +54,9 @@ const Sidebar = () => {
       icon: <Share2 size={20} />,
     },
     {
-      name: 'Settings',
-      path: '/admin/settings',
-      icon: <Settings size={20} />,
+      name: 'Privacy Policy',
+      path: '/admin/privacy-policy',
+      icon: <HelpCircle size={20} />,
     },
   ];
 
@@ -61,7 +66,7 @@ const Sidebar = () => {
       <div className="relative h-20 flex flex-col items-center justify-center border-b border-white/10">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 blur-xl"></div>
         <h1 className="relative text-2xl font-extrabold tracking-wide">
-          Xpenly
+          Finance
         </h1>
         <span className="relative text-xs text-gray-400">Admin Panel</span>
       </div>
