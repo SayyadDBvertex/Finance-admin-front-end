@@ -115,6 +115,11 @@ const ManageUsers = () => {
                     <th className="p-3 text-left">Profile</th>
                     <th className="p-3 text-left">Name</th>
                     <th className="p-3 text-left">Email</th>
+                    <th className="p-3 text-left">Gender</th>
+                    <th className="p-3 text-left">DOB</th>
+                    <th className="p-3 text-left">Mobile</th>
+                    <th className="p-3 text-left">City</th>
+                    <th className="p-3 text-left">State</th>
                     <th className="p-3 text-left">Role</th>
                     <th className="p-3 text-left">Transactions</th>
                   </tr>
@@ -148,6 +153,21 @@ const ManageUsers = () => {
                       </td>
 
                       <td className="p-3 text-gray-600 break-all">{u.email}</td>
+                      <td className="p-3 capitalize">{u.gender || '-'}</td>
+
+                      <td className="p-3">
+                        {u.dob ? new Date(u.dob).toLocaleDateString() : '-'}
+                      </td>
+
+                      <td className="p-3">{u.mobile || '-'}</td>
+
+                      <td className="p-3 capitalize">
+                        {u?.location?.city || '-'}
+                      </td>
+
+                      <td className="p-3 capitalize">
+                        {u?.location?.state || '-'}
+                      </td>
 
                       <td className="p-3 capitalize">
                         <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">
